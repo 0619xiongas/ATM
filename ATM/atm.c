@@ -122,39 +122,8 @@ int UserRegister(User* UserList, User* newUser)
 	return -1;
 }
 
-int UserLogin(User* UserList, User* user)
+int UserLogin(User* UserList, User* user, char* account, char* password)
 {
-	system("CLS");
-	char account[17];
-	char password[7];
-	printf("请输入您的账号\n");
-	scanf("%s", account);
-	printf("请输入您的密码\n");
-	int i = 0;
-	// 对密码输入进行保密
-	while (password[i] != '\n')
-	{
-		password[i] = _getch(); // 之后换成getch();
-		if(password[i] == '\r')
-			break;
-		if (password[i] == '\b')
-		{
-			if (i == 0)
-			{
-				printf("\a");
-				continue;
-			}
-			i = i - 1;
-			printf("\b");
-		}
-		else
-		{
-			putchar('*');
-			++i;
-		}
-	}
-	password[i] = '\0';
-	printf("\n");
 	User* Cur = UserList;
 	while (Cur)
 	{
@@ -163,7 +132,6 @@ int UserLogin(User* UserList, User* user)
 			if (strcmp(Cur->password, password) == 0)
 			{
 				// 成功
-				printf("登录成功\n");
 				strcpy(user->name, Cur->name);
 				strcpy(user->identity, Cur->identity);
 				strcpy(user->phone, Cur->phone);
@@ -175,14 +143,13 @@ int UserLogin(User* UserList, User* user)
 			}
 			else
 			{
-				printf("密码不正确，请重试\n");
-				return 0;
+				return EM_Password;
 			}
 			break;
 		}
 		Cur = Cur->next;
 	}
-	return 0;
+	return EM_NoRegister;
 }
 
 int UserDeposit(User* UserList, Deal* DealList, User* user, double deposit)
@@ -426,4 +393,5 @@ void InputPassword(char* pwd)
 		}
 	}
 	pwd[i] = '\0';
+
 }

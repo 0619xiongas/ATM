@@ -8,8 +8,10 @@
 typedef enum ErrorMsg
 {
     EM_NULL = 0, // 无错误码
-	EM_InsufficientBalance = 1, // 余额不足
+    EM_InsufficientBalance = 1, // 余额不足
     EM_HaveRegistered = 2, // 已经注册过了
+    EM_Password = 3, // 密码错误
+    EM_NoRegister = 4, // 用户未注册
     EM_UnknownError = 100, // 未知错误
 } EM;
 
@@ -72,7 +74,7 @@ void LoadDealInfo(Deal* DealList);
 // 注册账号函数
 int UserRegister(User* UserList, User* newUser);
 
-int UserLogin(User* UserList, User* user);
+int UserLogin(User* UserList, User* user,char* account,char* password);
 
 int UserDeposit(User* UserList, Deal* DealList, User* user, double deposit);
 

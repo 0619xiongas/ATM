@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "atm.h"
-void view_first();
-void view_second();
+void RegLoginView();
+void OperationView();
 void view_third();
 void view_forth();
 int Register(User* UserList);
@@ -14,18 +14,41 @@ int main()
 	// 系统随机种子 其他函数需要用到
 	srand((unsigned)(time(NULL)));
 
-	//User* UserList = (User*)malloc(sizeof(User));
-	//LoadUserInfo(UserList);
-	//PrintUserInfo(UserList);
-	//Register(UserList);
-	//User* user = (User*)malloc(sizeof(User));
+	User* UserList = (User*)malloc(sizeof(User));
+	LoadUserInfo(UserList);
+	User* user = (User*)malloc(sizeof(User));
+	RegLoginView();
+	int loginStep = 0;
+	int operateStep = 0;
+	scanf("%d", &loginStep);
+	while (loginStep)
+	{
+		switch (loginStep)
+		{
+		case 1:
+			Register(UserList);
+			loginStep++;
+			break;
+		case 2:
+		{
+			int ret = Login(UserList, user);
+			if (ret == EM_NoRegister)
+			{
+				loginStep--;
+			}
+		}
+		break;
+		case 3:
+			return 0;
+		default:
+			break;
+		}
+	}
 
-	//Login(UserList, user);
-	char pwd[10] = { 0 };
-	InputPassword(pwd);
 	return 0;
 }
-void view_first()
+
+void RegLoginView()
 {
 	printf("*****************************\n");
 	printf("**欢迎使用ATM自动取款机系统**\n");
@@ -35,11 +58,13 @@ void view_first()
 	printf("———————————————\n");
 	printf("|         2 登陆             |\n");
 	printf("———————————————\n");
+	printf("|         3 退出             |\n");
+	printf("———————————————\n");
 	printf("|      请选择您的需求        |\n");
 	printf("———————————————\n");
 }
 
-void view_second()
+void OperationView()
 {
 	printf("请选择您需要的业务\n");
 	printf("**********************************\n");
@@ -120,15 +145,22 @@ int Register(User* UserList)
 
 int Login(User* UserList, User* user)
 {
-	system("CLS");
-	char account[17];
-	char password[7];
-	printf("请输入您的账号\n");
-	scanf("%s", account);
-	printf("请输入您的密码（不超过6位)\n");
-	InputPassword(password);
+	int time = 3;
+	int ret = 0;
+	do
+	{
+		system("CLS");
+		char account[17];
+		char password[7];
+		printf("请输入您的账号\n");
+		scanf("%s", account);
+		printf("请输入您的密码（不超过6位),您还有%d次机会\n",time);
 
-	User* cur = UserList;
-	return 0;
+		InputPassword(password);
+		ret = UserLogin(UserList, user, account, password);
+		--time;
+	} while (time > 0 && ret == EM_Password);
+
+	return ret;
 }
 
