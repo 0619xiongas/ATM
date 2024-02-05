@@ -12,16 +12,12 @@ typedef enum ErrorMsg
     EM_HaveRegistered = 2, // 已经注册过了
     EM_Password = 3, // 密码错误
     EM_NoRegister = 4, // 用户未注册
+    EM_LoginSuccess, // 登录成功
+    EM_RegisterSuccess, // 注册成功
+    EM_DespositSuccess, // 存入成功
+    EM_WithdrawSuccess, // 取出成功
     EM_UnknownError = 100, // 未知错误
 } EM;
-
-typedef enum DealType
-{
-    TansferIn,  // 转入
-    TansferOut,   // 转出
-    Deposit,  // 存钱
-    Withdraw // 取钱
-} DealType;
 
 typedef enum ChangeType
 {
@@ -61,6 +57,9 @@ void PrintUserInfo(User* UserList);
 
 // 信息处理部分
 
+// 防止系统出错导致文件出错
+void SaveFile(User* UserList, Deal* DeaList);
+
 // 将user信息从文本加载到内存中，用链表保存
 void LoadUserInfo(User* UserList);
 
@@ -96,4 +95,6 @@ void CreateTimeStamp(Deal* node);
 
 // 输入密码做保护，不做要求
 void InputPassword(char* pwd);
+
+int IsFileEmpty(FILE* fp);
 #endif

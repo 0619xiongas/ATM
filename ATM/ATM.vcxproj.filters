@@ -24,6 +24,9 @@
     <ClCompile Include="atm.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Test.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="atm.h">

@@ -11,31 +11,90 @@ void PrintUserInfo(User* UserList)
 	}
 }
 
+void SaveFile(User* UserList, Deal* DeaList)
+{
+	WriteDealInfo(DeaList);
+	WriteUserInfo(UserList);
+}
+
 void LoadUserInfo(User* UserList)
 {
 	FILE* fp = NULL;
 	if ((fp = fopen("./resources/userInfo.txt", "r")) == NULL)
 	{
-		printf("userInfo cant be opened\n");
+		printf("userInfo 无法打开\n");
 		return;
 	}
 
 	// 尾插法加节点；
 	User* Tail = UserList;
-	int isHead = 0; // 此次存入的数据是否为头节点，即UserList;
+	if (IsFileEmpty(fp))
+	{
+		fclose(fp);
+		return;
+	}
+
 	while (!feof(fp))
 	{
-		if (0 == isHead)
-		{
-			fscanf(fp, "%s %s %s %s %s %lf", UserList->name,UserList->identity,UserList->phone,UserList->account,UserList->password,&UserList->balance);
-			isHead = 1;
-		}
-		User* Node = (User*)malloc(sizeof(User));
-		fscanf(fp, "%s %s %s %s %s %lf", Node->name, Node->identity, Node->phone, Node->account,Node->password,&Node->balance);
-		Tail->next = Node;
-		Tail = Node;
-		Node->next = NULL;
+		
 	}
+
+	//while (fscanf(fp, "%s %s %s %s %s %lf",
+	//	Tail->name, Tail->identity, Tail->phone, Tail->account, Tail->password, &Tail->balance) == 6)
+	//{
+	//	User* Node = (User*)malloc(sizeof(User));
+	//	if (fscanf(fp, "%s %s %s %s %s %lf",
+	//		Node->name, Node->identity, Node->phone, Node->account, Node->password, &Node->balance) == 6)
+	//	{
+	//		Tail->next = Node;
+	//		Tail = Node;
+	//		Node->next = NULL;
+	//	}
+	//	else
+	//	{
+	//		free(Node);  // 如果 fscanf 失败，释放已分配的内存
+	//		break;       // 如果 fscanf 失败，退出循环
+	//	}
+	//}
+
+	fclose(fp);
+}
+
+void LoadDealInfo(Deal* DealList)
+{
+	FILE* fp = NULL;
+	if ((fp = fopen("./resources/dealInfo.txt", "r")) == NULL)
+	{
+		printf("dealInfo 无法打开\n");
+		return;
+	}
+
+	Deal* Tail = DealList;
+
+	while (fscanf(fp, "%s %s %lf %d %d %d %d:%d:%d %lf",
+		Tail->account, Tail->type, &Tail->money,
+		&Tail->time_year, &Tail->time_month, &Tail->time_day,
+		&Tail->time_hour, &Tail->time_min, &Tail->time_sec,
+		&Tail->balance) == 10)
+	{
+		Deal* Node = (Deal*)malloc(sizeof(Deal));
+		if (fscanf(fp, "%s %s %lf %d %d %d %d:%d:%d %lf",
+			Node->account, Node->type, &Node->money,
+			&Node->time_year, &Node->time_month, &Node->time_day,
+			&Node->time_hour, &Node->time_min, &Node->time_sec,
+			&Node->balance) == 10)
+		{
+			Tail->next = Node;
+			Tail = Node;
+			Node->next = NULL;
+		}
+		else
+		{
+			free(Node);  
+			break;       
+		}
+	}
+
 	fclose(fp);
 }
 
@@ -50,6 +109,12 @@ void WriteUserInfo(User* UserList)
 	User* Node = UserList;
 	while (Node)
 	{
+		// 特殊处理写入最后一行不需要\n
+		if (Node->next == NULL)
+		{
+			fprintf(fp, "%s %s %s %s %s %lf", Node->name, Node->identity, Node->phone, Node->account, Node->password, Node->balance);
+			break;
+		}
 		fprintf(fp, "%s %s %s %s %s %lf\n", Node->name, Node->identity, Node->phone, Node->account, Node->password, Node->balance);
 		Node = Node->next;
 	}
@@ -67,6 +132,13 @@ void WriteDealInfo(Deal* DealList)
 	Deal* Node = DealList;
 	while (Node)
 	{
+		// 特殊处理 写入最后一行不需要\n
+		if (Node->next == NULL)
+		{
+			fprintf(fp, "%s %s %lf %d %d %d %d:%d:%d %lf\n", Node->account, Node->type, Node->money,
+				Node->time_year, Node->time_month, Node->time_day, Node->time_hour, Node->time_min, Node->time_sec, Node->balance);
+			break;
+		}
 		fprintf(fp, "%s %s %lf %d %d %d %d:%d:%d %lf\n", Node->account, Node->type, Node->money,
 			Node->time_year, Node->time_month, Node->time_day, Node->time_hour, Node->time_min, Node->time_sec, Node->balance);
 		Node = Node->next;
@@ -74,35 +146,7 @@ void WriteDealInfo(Deal* DealList)
 	fclose(fp);
 }
 
-void LoadDealInfo(Deal* DealList)
-{
-	FILE* fp = NULL;
-	if ((fp = fopen("./resources/dealInfo.txt", "r")) == NULL)
-	{
-		printf("dealInfo cant be opened\n");
-		return;
-	}
 
-	Deal* Tail = DealList;
-	int isHead = 0;
-	while (!feof(fp))
-	{
-		if (0 == isHead)
-		{
-			fscanf(fp, "%s %s %lf %d %d %d %d:%d:%d %lf", DealList->account, DealList->type, DealList->money,
-				DealList->time_year, DealList->time_month, DealList->time_day, DealList->time_hour, DealList->time_min, DealList->time_sec,
-				DealList->balance);
-			isHead = 1;
-		}
-		Deal* Node = (Deal*)malloc(sizeof(Deal));
-		fscanf(fp, "%s %s %lf %d %d %d %d:%d:%d %lf", Node->account, Node->type, &Node->money,
-			&Node->time_year, &Node->time_month, &Node->time_day, &Node->time_hour, &Node->time_min, &Node->time_sec, &Node->balance);
-		Tail->next = Node;
-		Tail = Node;
-		Node->next = NULL;
-	}
-	fclose(fp);
-}
 
 int UserRegister(User* UserList, User* newUser)
 {
@@ -115,11 +159,11 @@ int UserRegister(User* UserList, User* newUser)
 			cur->next = newUser;
 			newUser->next = NULL;
 			WriteUserInfo(UserList);
-			return 0;
+			return EM_RegisterSuccess;
 		}
 		cur = cur->next;
 	}
-	return -1;
+	return EM_UnknownError;
 }
 
 int UserLogin(User* UserList, User* user, char* account, char* password)
@@ -139,7 +183,7 @@ int UserLogin(User* UserList, User* user, char* account, char* password)
 				strcpy(user->password, Cur->password);
 				user->balance = Cur->balance;
 				user->next = NULL;
-				return 0;
+				return EM_LoginSuccess;
 			}
 			else
 			{
@@ -181,14 +225,14 @@ int UserDeposit(User* UserList, Deal* DealList, User* user, double deposit)
 					dCur->next = node;
 					node->next = NULL;
 					WriteDealInfo(DealList);
-					return (int)EM_NULL;
+					return EM_DespositSuccess;
 				}
 				dCur = dCur->next;
 			}
 		}
 		cur = cur->next;
 	}
-	return (int)EM_NULL;;
+	return EM_UnknownError;
 }
 
 int UserWithdraw(User* UserList, Deal* DealList, User* user, double withdraw)
@@ -221,7 +265,7 @@ int UserWithdraw(User* UserList, Deal* DealList, User* user, double withdraw)
 					node->next = NULL;
 					WriteDealInfo(DealList);
 
-					return (int)EM_NULL;
+					return EM_WithdrawSuccess;
 				}
 				dCur = dCur->next;
 			}
@@ -229,7 +273,7 @@ int UserWithdraw(User* UserList, Deal* DealList, User* user, double withdraw)
 		}
 		cur = cur->next;
 	}
-	return (int)EM_NULL;
+	return EM_UnknownError;
 }
 
 void Transfer(User* UserList, Deal* DealList, User* out, User* in, double money)
@@ -395,3 +439,20 @@ void InputPassword(char* pwd)
 	pwd[i] = '\0';
 
 }
+
+int IsFileEmpty(FILE* fp)
+{
+	// 记录当前文件指针所在的位置
+	long curIndex = ftell(fp);
+
+	// 将文件指针移到最后
+	fseek(fp, 0, SEEK_END);
+
+	int ret = (ftell(fp) == 0 ? 1 : 0);
+
+	// 将文件指针还原
+	fseek(fp, curIndex, SEEK_SET);
+
+	return ret;
+}
+
